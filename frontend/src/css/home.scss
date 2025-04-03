@@ -1,5 +1,5 @@
 .banner {
-    height: 700px;
+    height: 500px;
     background-image: url('./../img/parking-banner.jpg');
     background-repeat: no-repeat;
     background-size: cover;
@@ -79,15 +79,15 @@
     width: 55vw;
     object-fit: cover;
     border-radius: 10px;
-    height: 100%;
-
+    height: 400px;
 }
 
 .hero-image2{
     width: 35vw;
     object-fit: cover;
-    height: 100%;
+    height: 625px;
     border-radius: 10px;
+    margin-bottom: 10px;
 }
 
 .secondBox{

@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { register } from '../api/api'
 import './../css/auth.scss'
+import Layout from './Layout'
 
 const Register = () => {
     const [name, setName] = useState('')
@@ -29,6 +30,8 @@ const Register = () => {
     }
 
     return (
+        <>
+        <Layout/>
         <div className='auth-container'>
             <div className='card login-card m-auto p-5'>
                 <h3 className='mb-4'>Sign up</h3>
@@ -64,6 +67,7 @@ const Register = () => {
                 <button type="submit" className="btn btn-outline-primary mt-3" onClick={() => handleRegister()}>Submit</button>
             </div>
         </div>
+        </>
     )
 }
 

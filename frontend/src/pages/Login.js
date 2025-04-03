@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { login } from '../api/api'
 import { setUser } from '../reducers/userReducer'
 import './../css/auth.scss'
+import Layout from './Layout'
 
 const Login = () => {
     const navigate = useNavigate()
@@ -29,6 +30,8 @@ const Login = () => {
     }
 
     return (
+        <>
+        <Layout/>
         <div className='container-fluid auth-container'>
             <div className='card login-card m-auto p-5'>
                 <h3 className='mb-4'>Sign in</h3>
@@ -49,6 +52,7 @@ const Login = () => {
                 <button type="submit" className="btn btn-outline-primary mt-3" onClick={() => handleLogin()}>Submit</button>
             </div>
         </div>
+        </>
     )
 }
 

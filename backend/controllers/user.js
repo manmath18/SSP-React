@@ -69,13 +69,13 @@ userRouter.get("/", async (req, res) => {
     }
 });
 
-// Login existing user
 userRouter.post("/login", async (req, res) => {
     try {
         const { email, password } = req.body;
 
+        // Joi schema validation
         const schema = Joi.object({
-            email: Joi.string().min(8).max(50).required().email(),
+            email: Joi.string().email().min(8).max(50).required(),
             password: Joi.string().min(6).max(20).required(),
         });
 
@@ -84,21 +84,30 @@ userRouter.post("/login", async (req, res) => {
             return res.status(400).json({ error: error.details[0].message });
         }
 
+        // Check if user exists
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(400).json({ error: "User doesn't exist" });
+            return res.status(401).json({ error: "Invalid email or password" });
         }
 
+        // Verify password
         const passwordMatch = await bcrypt.compare(password, user.password);
         if (!passwordMatch) {
-            return res.status(400).json({ error: "Password doesn't match" });
+            return res.status(401).json({ error: "Invalid email or password" });
         }
 
-        const token = jwt.sign({ id: user._id, email: user.email }, SECRET_JWT_CODE, { expiresIn: "1h" });
-        res.json({ user, token });
+        // Generate JWT token
+        const SECRET_JWT_CODE = process.env.SECRET_JWT_CODE;  // Ensure it's loaded from env
+        const token = jwt.sign({ id: user._id, email: user.email }, SECRET_JWT_CODE, { expiresIn: "1d" });
+
+        // Remove password before sending response
+        const safeUser = user.toObject();
+        delete safeUser.password;
+
+        res.json({ user: safeUser, token });
     } catch (error) {
         console.error("Error during login:", error);
-        res.status(400).json({ error: "An error occurred during login." });
+        res.status(500).json({ error: "An error occurred during login." });
     }
 });
 

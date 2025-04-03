@@ -1,10 +1,15 @@
 import React from "react";
 import "./../css/home.scss";
+import Layout from "./Layout";
+import Footer from "./Footer";
+import "./../css/footer.scss";
+import "./../css/layout.scss";
 
 function Home() {
 	return (
 		<div>
-			{/* <div className='banner'>
+      <Layout/>
+			<div className='banner'>
         <div className='overlay'>
           <h1>Looking for parking. <br /> <span>You have came to right place</span></h1>
         </div>
@@ -45,10 +50,8 @@ function Home() {
               </div>
             </div>
           </div>
-        </section> */}
-
-			{/* Testimonial */}
-			{/* <section className='my-5'>
+        </section> 
+			 <section className='my-5'>
           <h2 className='mt-5'>Testimonial</h2>
           <div className='row'>
             <div className='col-md-6'>
@@ -67,22 +70,8 @@ function Home() {
             </div>
           </div>
         </section>
-      </div> */}
-
-			<div>
-				<div className="box">
-					<div>
-						<h1 className="hero-text days-one-regular">QUICK SEARCH FOR <span>PARKING</span></h1>
-						<img className="hero-image" src="./HeroImage.jpg" />
-					</div>
-					<div className="secondBox">
-            <img className="hero-image2" src="./heroimagetwo.jpg" />
-          </div>
-				</div>
-			</div>
-
-
-
+      </div>
+      <Footer/>
 		</div>
 	);
 }
