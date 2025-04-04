@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { resetPassword, updateUser } from '../api/api'
 import { setUser } from '../reducers/userReducer';
 import './../css/createParking.scss'
+import Layout from './Layout';
 
 const Profile = () => {
     const dispatch = useDispatch();
@@ -77,6 +78,8 @@ const Profile = () => {
     }, [user])
 
     return (
+       <>
+       <Layout/>
         <div className='container py-5'>
             <div className='card create-parking-card p-5'>
                 <h3 className='mb-4'>Manage Profile</h3>
@@ -128,6 +131,7 @@ const Profile = () => {
                 <button type="submit" className="btn btn-primary mt-4" onClick={handleResetPassword}>Change Password</button>
             </div>
         </div>
+       </>
     )
 }
 

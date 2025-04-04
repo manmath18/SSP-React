@@ -5,6 +5,7 @@ import { deleteSpace, fetchSpaces } from '../api/api'
 import { DeleteModal, SpaceCard } from '../components'
 
 import './../css/parking.scss'
+import Layout from './Layout'
 
 const Space = () => {
     const user = useSelector((state) => state.user);
@@ -116,6 +117,8 @@ const Space = () => {
 
 
     return (
+        <>
+        <Layout/>
         <div className='container'>
             <h1 className='mt-5'>Search Results</h1>
             <div className='card p-4 mt-5'>
@@ -160,6 +163,7 @@ const Space = () => {
 
             <DeleteModal value={selectedSpace?.name} showModal={showDeleteModal} setShowModal={setShowDeleteModal} onDeleteConfirm={handleDeleteSpace} />
         </div>
+        </>
     )
 }
 

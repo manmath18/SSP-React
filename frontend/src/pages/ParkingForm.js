@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { createParking, updateParking } from '../api/api'
 import './../css/createParking.scss'
+import Layout from './Layout';
 
 const ParkingForm = () => {
     const { state } = useLocation()
@@ -79,6 +80,8 @@ const ParkingForm = () => {
     }, [state])
 
     return (
+       <>
+       <Layout/>
         <div className='container py-5'>
             <div className='card create-parking-card p-5'>
                 <h3 className='mb-4'>{state?.parking ? 'Update': 'Create'} parking</h3>
@@ -111,6 +114,7 @@ const ParkingForm = () => {
                 <button type="submit" className="btn btn-primary mt-4" onClick={handleSubmit}>Submit</button>
             </div>
         </div>
+       </>
     )
 }
 

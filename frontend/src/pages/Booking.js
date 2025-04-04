@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom'
 import { deleteBooking, fetchBookings, updateBooking } from '../api/api'
 import { DeleteModal } from '../components';
+import Layout from './Layout';
 
 const Booking = () => {
     const user = useSelector((state) => state.user);
@@ -111,6 +112,8 @@ const Booking = () => {
 
 
     return (
+        <>
+        <Layout/>
         <div className='container'>
             <h1 className='mt-5'>My Bookings</h1>
 
@@ -144,6 +147,7 @@ const Booking = () => {
             </div>
             <DeleteModal showModal={showDeleteModal} setShowModal={setShowDeleteModal} onDeleteConfirm={handleDeleteBooking} />
         </div>
+        </>
     )
 }
 

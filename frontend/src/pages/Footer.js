@@ -31,7 +31,7 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between items-center">
           {/* Copyright */}
           <p className="text-sm text-center md:text-left">
-            &copy; {currentYear} <strong></strong>. All Rights Reserved.
+            &copy; {currentYear} <strong>Abhyuday</strong>. All Rights Reserved.
           </p>
 
           {/* Social Media Icons */}

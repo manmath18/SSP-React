@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom'
 import { createReview, deleteReview, fetchReviews } from '../api/api'
 import { DeleteModal, StarRating } from '../components';
+import Layout from "./Layout"
 
 const Reviews = () => {
     const user = useSelector((state) => state.user);
@@ -98,6 +99,8 @@ const Reviews = () => {
 
 
     return (
+        <>
+        <Layout/>
         <div className='container'>
             <h1 className='mt-5'>My Reviews</h1>
 
@@ -127,6 +130,7 @@ const Reviews = () => {
             </div>
             <DeleteModal showModal={showDeleteModal} setShowModal={setShowDeleteModal} onDeleteConfirm={handleDeleteReview} />
         </div>
+        </>
     )
 }
 

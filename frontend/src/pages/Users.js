@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { deleteUser, fetchUsers } from '../api/api'
 import { DeleteModal } from '../components';
+import Layout from './Layout';
 
 const Users = () => {
     const [users, setUsers] = useState()
@@ -54,6 +55,8 @@ const Users = () => {
 
 
     return (
+       <>
+       <Layout/>
         <div className='container'>
             <h1 className='mt-5'>My Users</h1>
 
@@ -80,6 +83,7 @@ const Users = () => {
             </div>
             <DeleteModal value={selectedUser?.name} showModal={showDeleteModal} setShowModal={setShowDeleteModal} onDeleteConfirm={handleDeleteUser} />
         </div>
+       </>
     )
 }
 

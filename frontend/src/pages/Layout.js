@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import react from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
 import { clearUser } from "../reducers/userReducer";
@@ -58,9 +58,11 @@ const Layout = () => {
                                     <li className="nav-item ms-2">
                                         <Link className="nav-link" to='/profile'><div className="bg-dark px-3 py-2 rounded-circle pointer">{user?.name && user?.name[0]}</div></Link>
                                     </li>
+                                    <Link to="/">
                                     <li className="nav-item ms-2">
                                         <button className="btn btn-outline-info" onClick={handleLogout}>Logout</button>
                                     </li>
+                                    </Link>
                                 </>
                                 :
                                 <li className="nav-item ms-2">

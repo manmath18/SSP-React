@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { deleteParking, fetchParkings } from '../api/api'
 import { DeleteModal, ParkingCard } from '../components'
 import './../css/parking.scss'
+import Layout from './Layout'
 
 const Parking = () => {
     const user = useSelector((state) => state.user);
@@ -57,6 +58,8 @@ const Parking = () => {
     }
 
     return (
+        <>
+        <Layout/>
         <div className='container'>
             <h1 className='mt-5'>Parkings</h1>
 
@@ -65,6 +68,7 @@ const Parking = () => {
             </div>
             <DeleteModal value={selectedParking?.name} showModal={showDeleteModal} setShowModal={setShowDeleteModal} onDeleteConfirm={handleDeleteParking}/>
         </div>
+        </>
     )
 }
 
