@@ -12,6 +12,15 @@ import Profile from './pages/Profile';
 import Reviews from './pages/Reviews';
 import Users from './pages/Users';
 import About from './pages/About.js';
+import ImageUpload from './pages/ImageUpload';
+// import { useState } from 'react';
+// import axios from 'axios';
+// import { useEffect } from 'react';
+// import { useNavigate } from 'react-router-dom';
+// import { useLocation } from 'react-router-dom';
+// import { useParams } from 'react-router-dom';
+// import { useRef } from 'react';
+// import { useMemo } from 'react';
 
 function App() {
   return (
@@ -32,6 +41,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/*" element={<NoPage />} />
+        <Route path="/upload" element={<ImageUpload />} />
       </Routes>
     </BrowserRouter>
     </>

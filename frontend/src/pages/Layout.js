@@ -1,4 +1,4 @@
-import react from "react";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
 import { clearUser } from "../reducers/userReducer";
@@ -18,7 +18,7 @@ const Layout = () => {
         <div className="main-container">
             <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
                 <div className="container">
-                   <Link to="/"><img className="logo" src="./logo3.png" /></Link>
+                    <Link to="/"><img className="logo" src="./logo3.png" /></Link>
                     <div className="collapse navbar-collapse" id="navbarNavDropdown">
                         <ul className="navbar-nav ms-auto align-items-center">
                             <li className="nav-item">
@@ -53,6 +53,9 @@ const Layout = () => {
                                     </li>
                                 </>
                             }
+                            <li className="nav-item">
+                                <Link className="nav-link" to='/upload'>Process Image</Link> {/* New Button */}
+                            </li>
                             {user ?
                                 <>
                                     <li className="nav-item ms-2">
