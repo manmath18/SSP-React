@@ -1,0 +1,134 @@
+.book-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.booking-card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.slot-details, .parking-details {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+}
+
+.slot-details p, .parking-details p {
+    font-size: 16px;
+    color: #333;
+    margin: 5px 0;
+}
+.h3-Book{
+    font-size: 24px;
+    font-weight: bold;
+    color: #343a40;
+    margin-bottom: 20px;
+}
+
+.form-label {
+    font-weight: bold;
+    color: #fff;
+}
+.form-book-label{
+    font-weight: bold;
+    color: #343a40;
+}
+
+.form-control {
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.payment-method-grid {
+    display: flex;
+    gap: 20px;
+}
+
+.btn-primary, .btn-secondary {
+    width: 48%; /* Half the width of the container */
+    transition: background-color 0.2s ease-in-out;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.btn-secondary {
+    background-color: #d3d3d3;
+    border: none;
+    cursor: not-allowed;
+}
+
+.btn-secondary.enabled {
+    background-color: #007bff;
+    cursor: pointer;
+}
+
+.btn-secondary.enabled:hover {
+    background-color: #0056b3;
+}
+.form-check-label{
+    margin-left: 5px;
+    color:#343a40;
+    font-size:large;
+}
+.booking-table {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.booking-table th {
+    background-color: #007bff;
+    color: white;
+    text-align: center;
+    font-weight: bold;
+}
+
+.booking-table td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.booking-table tr:hover {
+    background-color: #f8f9fa;
+}
+
+.btn-outline-success {
+    color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-outline-success:hover {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-outline-danger {
+    color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: white;
+}
+
+.text-center {
+    font-style: italic;
+    color: #6c757d;
+}
+.btn-outline-warning {
+    color: #ffc107;
+    border-color: #ffc107;
+}
+
+.btn-outline-warning:hover {
+    background-color: #ffc107;
+    color: white;
+}

@@ -1,0 +1,98 @@
+.slot-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative; /* For positioning the hover dialog */
+}
+
+.parking-details-card {
+    background-color: #f8f9fa;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.parking-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: #343a40;
+    margin-bottom: 20px;
+}
+
+.parking-info p {
+    font-size: 16px;
+    color: #495057;
+    margin: 5px 0;
+}
+
+.slot-availability-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: #09eb4d;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.slots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+    justify-content: center;
+}
+
+.slot-box {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    border-radius: 8px;
+    color: white;
+    font-size: 16px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.slot-box.empty {
+    background-color: #28a745; /* Green for available slots */
+}
+
+.slot-box.booked {
+    background-color: #dc3545;
+    color:white /* Red for booked slots */
+}
+
+.slot-box:hover {
+    transform: scale(1.1);
+    opacity: 0.9;
+}
+
+.slot-dialog {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #4CC9FE;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+    text-align: center;
+    width: 500px;
+}
+
+.slot-dialog p {
+    margin: 10px 0;
+    font-size: 20px;
+    color: #b91515;    
+}
+
+.slot-dialog .btn {
+    margin-top: 10px;
+}

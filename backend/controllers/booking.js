@@ -1,131 +1,150 @@
-import {Router} from "express";
-import { Booking } from "../models/bookingSchema.js";  // Corrected import
-import Joi from "joi";
+import { Router } from "express";
+import { Booking } from "../models/bookingSchema.js";
+import { Parking } from "../models/parkingSchema.js";
 import { Types } from "mongoose";
 
 const bookingRouter = Router();
 
-// Create new booking
+// Middleware to check if the user is an owner
+const isOwner = async (req, res, next) => {
+    const { user_id } = req.query; // Assuming user_id is passed in the query or headers
+    const { id } = req.params; // Booking ID for update/delete routes
+
+    try {
+        console.log("Middleware: user_id:", user_id, "booking_id:", id); // Debugging
+
+        if (!user_id) {
+            return res.status(400).json({ error: "User ID is missing" });
+        }
+
+        if (!Types.ObjectId.isValid(user_id)) {
+            return res.status(400).json({ error: "Invalid user ID" });
+        }
+
+        // Check if the user is the owner of the parking associated with the booking
+        const booking = await Booking.findById(id).populate("parking_id");
+        if (!booking) {
+            return res.status(404).json({ error: "Booking not found" });
+        }
+
+        console.log("Middleware: booking.parking_id.user_id:", booking.parking_id.user_id.toString()); // Debugging
+
+        if (booking.parking_id.user_id.toString() !== user_id) {
+            return res.status(403).json({ error: "You are not authorized to perform this action" });
+        }
+
+        next();
+    } catch (error) {
+        console.error("Authorization error:", error);
+        res.status(500).json({ error: "An error occurred while checking ownership" });
+    }
+};
 bookingRouter.post("/", async (req, res) => {
     try {
-        let { vehicle_company, vehicle_model, plate_number, car_color, space_id, user_id, confirm_booking = "pending" } = req.body;
+        const { vehicle_name, plate_number, start_time, paymentMethod, slotNumber, parking_id, user_id } = req.body;
 
-        // Input validation
-        const schema = Joi.object({
-            vehicle_company: Joi.string().required(),
-            vehicle_model: Joi.string().required(),
-            plate_number: Joi.string().required(),
-            car_color: Joi.string().required(),
-            space_id: Joi.string().required(),
-            user_id: Joi.string().required(),
-            confirm_booking: Joi.string().valid("approved", "pending", "rejected"),
+        // Create the booking
+        const booking = await Booking.create({
+            vehicle_name,
+            plate_number,
+            start_time,
+            paymentMethod,
+            slotNumber,
+            parking_id,
+            user_id,
+            confirm_booking: "confirmed", // Automatically set to confirmed
         });
 
-        const { error } = schema.validate({ vehicle_company, vehicle_model, plate_number, car_color, space_id, user_id, confirm_booking });
-        if (error) {
-            return res.status(400).json({ error: error.details[0].message });
-        }
-        const existsBooking = await Booking.findOne({ user_id, space_id });
-        if (existsBooking) {
-            return res.status(400).json({ error: 'Space is already booked' });
-        } else {
-            const booking = await Booking.create({ vehicle_company, vehicle_model, plate_number, car_color, space_id, user_id, confirm_booking });
-            res.json({ message: "Booking created", booking });
-        }
+        res.json({ message: "Booking created successfully", booking });
     } catch (error) {
-        console.error(" error - ", error);
-        res.status(400).json({ error });
+        console.error("Error creating booking:", error);
+        res.status(500).json({ error: "An error occurred while creating the booking" });
     }
 });
-
-// Get existing booking list
+// Fetch bookings
 bookingRouter.get("/", async (req, res) => {
     try {
         const { user_id, owner_id } = req.query;
+
+        let query = {};
         if (user_id) {
-            const booking = await Booking.find({ user_id }).populate({ path: 'space_id', populate: { path: 'parking_id' } });
-            return res.json(booking);
-        }
-        let booking = await Booking.find({}).populate({ path: 'space_id', populate: { path: 'parking_id' } });
-        if (owner_id) {
-            booking = booking.filter((item) => item?.space_id?.parking_id?.user_id.equals(owner_id));
+            // Fetch bookings for a specific user (seeker)
+            query.user_id = user_id;
         }
 
-        res.json(booking);
+        let bookings;
+
+        if (owner_id) {
+            // Fetch bookings for all parkings created by the owner
+            const parkings = await Parking.find({ user_id: owner_id }).select("_id");
+            const parkingIds = parkings.map((parking) => parking._id);
+
+            bookings = await Booking.find({ parking_id: { $in: parkingIds } })
+                .populate("parking_id", "name address city") // Populate parking details
+                .populate("user_id", "name email"); // Populate user details
+        } else {
+            // Fetch bookings for a specific user (seeker)
+            bookings = await Booking.find(query)
+                .populate("parking_id", "name address city") // Populate parking details
+                .populate("user_id", "name email"); // Populate user details
+        }
+
+        res.json(bookings);
     } catch (error) {
-        res.status(400).json({ error });
+        console.error("Error fetching bookings:", error);
+        res.status(500).json({ error: "An error occurred while fetching bookings" });
     }
 });
-
-// Update booking
-bookingRouter.put("/:id", async (req, res) => {
+// Update a booking (only for owners)
+bookingRouter.put("/:id", isOwner, async (req, res) => {
     try {
         const { id } = req.params;
         const { confirm_booking } = req.body;
 
-        if (Types.ObjectId.isValid(id)) {
-            const booking = await Booking.findById({ _id: id });
-            if (!booking) {
-                res.status(400).json({ error: "Provide correct booking id" });
-            } else {
-                // Input validation
-                const schema = Joi.object({
-                    space_id: Joi.string().required(),
-                    user_id: Joi.string().required(),
-                    confirm_booking: Joi.string().valid("approved", "pending", "rejected"),
-                });
-
-                let { space_id, user_id } = booking;
-                space_id = space_id.toString();
-                user_id = user_id.toString();
-                const updatedBookingObj = { space_id, user_id, ...req.body, confirm_booking };
-
-                const { error } = schema.validate(updatedBookingObj);
-                if (error) {
-                    res.status(400).json({ error: error.details[0].message });
-                } else {
-                    console.log('updatedBookingObj ', updatedBookingObj);
-                    if(updatedBookingObj?.confirm_booking === 'approved') {
-                        await Booking.updateMany({ space_id }, { $set: { confirm_booking: 'rejected' } });
-                    }
-                    const updatedBooking = await booking.updateOne(updatedBookingObj);
-
-                    if (updatedBooking) {
-                        res.json({ message: 'Booking updated successfully' });
-                    } else {
-                        res.status(400).json({ error: 'Booking not updated' });
-                    }
-                }
-            }
-        } else {
-            res.status(400).json({ error: "Invalid id" });
+        if (!Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ error: "Invalid booking ID" });
         }
 
+        const booking = await Booking.findById(id);
+        if (!booking) {
+            return res.status(404).json({ error: "Booking not found" });
+        }
+
+        // Update the booking status
+        booking.confirm_booking = confirm_booking || booking.confirm_booking;
+        await booking.save();
+
+        res.json({ message: "Booking updated successfully", booking });
     } catch (error) {
-        console.error(error);
-        res.status(400).json({ error });
+        console.error("Error updating booking:", error);
+        res.status(500).json({ error: "An error occurred while updating the booking" });
     }
 });
 
-// Delete booking
-bookingRouter.route('/:id').delete(async (req, res) => {
+// Delete a booking (only for owners)
+bookingRouter.delete("/:id", isOwner, async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Validate id and delete booking if it exists
-        if (Types.ObjectId.isValid(id)) {
-            const booking = await Booking.findByIdAndDelete({ _id: id });
-
-            if (booking) {
-                res.json({ message: "Booking deleted successfully" });
-            } else {
-                res.status(404).json({ error: "Booking not found" });
-            }
-        } else {
-            res.status(400).json({ error: "Invalid booking id" });
+        if (!Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ error: "Invalid booking ID" });
         }
+
+        const booking = await Booking.findByIdAndDelete(id);
+        if (!booking) {
+            return res.status(404).json({ error: "Booking not found" });
+        }
+
+        const parking = await Parking.findOneAndUpdate(
+            { "slots._id": booking.slot_id },
+            { $set: { "slots.$.isBooked": false } },
+            { new: true }
+        );
+
+        res.json({ message: "Booking deleted successfully" });
     } catch (error) {
-        res.status(400).json({ error });
+        console.error("Error deleting booking:", error);
+        res.status(500).json({ error: "An error occurred while deleting the booking" });
     }
 });
 

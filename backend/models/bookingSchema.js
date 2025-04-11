@@ -1,36 +1,43 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
 const bookingSchema = new mongoose.Schema({
-    vehicle_company: {
+    vehicle_name: {
         type: String,
-        required: true
-    },
-    vehicle_model: {
-        type: String,
-        required: true
+        required: true,
     },
     plate_number: {
         type: String,
-        required: true
+        required: true,
     },
-    car_color: {
+    start_time: {
         type: String,
-        required: true
+        required: true,
+    },
+    paymentMethod: {
+        type: String,
+        required: true,
+        enum: ["cash", "online"],
     },
     confirm_booking: {
         type: String,
         required: true,
-        enum: ["approved", "rejected", "pending"],
-        default: "pending"
+        enum: ["approved", "rejected", "pending", "confirmed"], // Add "confirmed" as a valid value
+        default: "pending",
     },
-    space_id: {
+    slotNumber: {
+        type: Number, // Store the slot number directly
+        required: true,
+    },
+    parking_id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Space',
+        ref: "Parking", // Reference the Parking model
+        required: true,
     },
     user_id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-    }
-}, { timestamps: true })
+        ref: "User",
+        required: true,
+    },
+}, { timestamps: true });
 
-export const Booking=mongoose.model("Booking", bookingSchema)
+export const Booking = mongoose.model("Booking", bookingSchema);

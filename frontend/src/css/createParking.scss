@@ -50,3 +50,9 @@
 .slot:hover {
     transform: scale(1.1);
 }
+.create-parking-card {
+    width: 50%; /* Set the width to 70% */
+    margin: 0 auto; /* Center the card horizontally */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for better visibility */
+    border-radius: 10px; /* Optional: Add rounded corners */
+}

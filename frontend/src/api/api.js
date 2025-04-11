@@ -1,35 +1,37 @@
 import axios from 'axios'
 const BASE_URL = "http://localhost:8000/"
 
-export const fetchParkings = async ({ user_id, setParkings }) => {
+export const fetchParkings = async ({ user_id, city, price, setParkings }) => {
     try {
         let query = '';
-        if (user_id) {
-            query += `?user_id=${user_id}`
-        }
-        const result = await axios.get(`${BASE_URL}parking${query}`)
+        if (user_id) query += `user_id=${user_id}&`;
+        if (city) query += `city=${city}&`;
+        if (price) query += `price=${price}&`;
+
+        console.log("Query Sent to Backend:", query); // Debugging
+
+        const result = await axios.get(`${BASE_URL}parking?${query}`);
         if (result?.data?.length) {
-            setParkings(result?.data)
+            setParkings(result?.data);
         }
         console.log('fetchParkings ', result);
     } catch (error) {
         console.error('fetchParkings ', error);
     }
-}
-
+};
 export const login = async ({ email, password, handleLoginSuccess, handleLoginFailure }) => {
     try {
-        const result = await axios.post(`${BASE_URL}user/login`, { email, password })
+        const result = await axios.post(`${BASE_URL}user/login`, { email, password });
         if (result?.data?.token) {
-            return handleLoginSuccess(result.data)
+            localStorage.setItem("user_id", result.data.user._id); // Store user_id in localStorage
+            return handleLoginSuccess(result.data);
         }
         console.log('login ', result);
     } catch (error) {
         console.error('login ', error);
-        handleLoginFailure(error?.response?.data?.error)
+        handleLoginFailure(error?.response?.data?.error);
     }
-}
-
+};
 export const register = async ({ name, email, password, type, handleRegisterSuccess, handleRegisterFailure }) => {
     try {
         const result = await axios.post(`${BASE_URL}user/register`, {
@@ -51,30 +53,30 @@ export const register = async ({ name, email, password, type, handleRegisterSucc
 
 export const createParking = async ({ body, handleCreateParkingSuccess, handleCreateParkingFailure }) => {
     try {
-        const result = await axios.post(`${BASE_URL}parking`, { ...body })
+        console.log("Payload Sent to Backend:", body); // Debugging
+        const result = await axios.post(`${BASE_URL}parking`, { ...body });
         if (result?.data?.parking) {
-            return handleCreateParkingSuccess(result.data)
+            return handleCreateParkingSuccess(result.data);
         }
-        console.log('createParking ', result);
+        console.log("createParking Response:", result);
     } catch (error) {
-        console.error('createParking ', error);
-        handleCreateParkingFailure(error?.response?.data?.error)
+        console.error("createParking Error:", error);
+        handleCreateParkingFailure(error?.response?.data?.error);
     }
-}
+};
 
 export const updateParking = async ({ id, body, handleUpdateParkingSuccess, handleUpdateParkingFailure }) => {
     try {
-        const result = await axios.put(`${BASE_URL}parking/${id}`, { ...body })
+        const result = await axios.put(`${BASE_URL}parking/${id}`, { ...body });
         if (result?.data?.message) {
-            return handleUpdateParkingSuccess(result.data)
+            return handleUpdateParkingSuccess(result.data);
         }
         console.log('updateParking ', result);
     } catch (error) {
         console.error('updateParking ', error);
-        handleUpdateParkingFailure(error?.response?.data?.error)
+        handleUpdateParkingFailure(error?.response?.data?.error);
     }
-}
-
+};
 export const fetchSpaces = async ({ user_id, parking_id, city, date, time, availability, setSpaces }) => {
     try {
         let query = ''
@@ -131,39 +133,68 @@ export const updateSpace = async ({ id, body, handleUpdateSpaceSuccess, handleUp
         handleUpdateSpaceFailure(error?.response?.data?.error)
     }
 }
-
-export const fetchBookings = async ({ owner_id, user_id, setBookings }) => {
+export const fetchBookings = async ({ user_id, owner_id, setBookings }) => {
     try {
         let query = '';
-        if(user_id){
-            query += `user_id=${user_id}&`;
-        }
-        if(owner_id){
-            query += `owner_id=${owner_id}&`;
-        }
-        const result = await axios.get(`${BASE_URL}booking?${query}`)
-        if (result?.data?.length) {
-            setBookings(result?.data)
-        }
-        console.log('fetchBookings ', result);
-    } catch (error) {
-        console.error('fetchBookings ', error);
-    }
-}
+        if (user_id) query += `user_id=${user_id}&`;
+        if (owner_id) query += `owner_id=${owner_id}&`;
 
+        console.log("Query Sent to Backend:", query); // Debugging
+
+        const result = await axios.get(`${BASE_URL}booking?${query}`);
+        if (result?.data?.length) {
+            setBookings(result?.data);
+        }
+        console.log("Fetched Bookings:", result.data); // Debugging
+    } catch (error) {
+        console.error("fetchBookings Error:", error);
+    }
+};
+// Create a booking
 export const createBooking = async ({ body, handleCreateBookingSuccess, handleCreateBookingFailure }) => {
     try {
-        const result = await axios.post(`${BASE_URL}booking`, { ...body })
+        const result = await axios.post(`${BASE_URL}booking`, { ...body });
         console.log('createBooking ', result?.data);
         if (result?.data?.booking) {
-            return handleCreateBookingSuccess(result.data)
+            return handleCreateBookingSuccess(result.data);
         }
     } catch (error) {
         console.error('createBooking ', error);
-        handleCreateBookingFailure(error?.response?.data?.error)
+        handleCreateBookingFailure(error?.response?.data?.error);
     }
-}
+};
 
+// Update a booking
+export const updateBooking = async ({ id, body, handleUpdateBookingSuccess, handleUpdateBookingFailure }) => {
+    try {
+        const user_id = localStorage.getItem("user_id"); // Retrieve user_id from localStorage
+        if (!user_id) {
+            throw new Error("User ID is missing"); // Throw an error if user_id is not found
+        }
+
+        const result = await axios.put(`${BASE_URL}booking/${id}?user_id=${user_id}`, { ...body }); // Pass user_id in query
+        if (result?.data?.message) {
+            return handleUpdateBookingSuccess(result.data?.message);
+        }
+        console.log('updateBooking ', result);
+    } catch (error) {
+        console.error('updateBooking ', error);
+        handleUpdateBookingFailure(error?.response?.data?.error || error.message);
+    }
+};
+// Delete a booking
+export const deleteBooking = async ({ id, handleDeleteBookingSuccess, handleDeleteBookingFailure }) => {
+    try {
+        const result = await axios.delete(`${BASE_URL}booking/${id}`);
+        if (result?.data?.message) {
+            return handleDeleteBookingSuccess(result.message);
+        }
+        console.log('deleteBooking ', result);
+    } catch (error) {
+        console.error('deleteBooking ', error);
+        handleDeleteBookingFailure(error?.response?.data?.error);
+    }
+};
 export const resetPassword = async ({ user_id, body, handleResetPasswordSuccess, handleResetPasswordFailure }) => {
     try {
         console.log('body ', body);
@@ -216,32 +247,6 @@ export const deleteSpace = async ({ id, handleDeleteSpaceSuccess, handleDeleteSp
     } catch (error) {
         console.error('deleteSpace ', error);
         handleDeleteSpaceFailure(error?.response?.data?.error)
-    }
-}
-
-export const deleteBooking = async ({ id, handleDeleteBookingSuccess, handleDeleteBookingFailure }) => {
-    try {
-        const result = await axios.delete(`${BASE_URL}booking/${id}`)
-        if (result?.data?.message) {
-            return handleDeleteBookingSuccess(result.message)
-        }
-        console.log('deleteBooking ', result);
-    } catch (error) {
-        console.error('deleteBooking ', error);
-        handleDeleteBookingFailure(error?.response?.data?.error)
-    }
-}
-
-export const updateBooking = async ({ id, body, handleUpdateBookingSuccess, handleUpdateBookingFailure }) => {
-    try {
-        const result = await axios.put(`${BASE_URL}booking/${id}`, { ...body })
-        if (result?.data?.message) {
-            return handleUpdateBookingSuccess(result.data?.message)
-            console.log('updateBooking >>>>  ', result?.data);
-        }
-    } catch (error) {
-        console.error('updateBooking ', error);
-        handleUpdateBookingFailure(error?.response?.data?.error)
     }
 }
 

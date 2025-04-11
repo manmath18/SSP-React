@@ -112,7 +112,7 @@ const ImageUpload = () => {
             <div className="container py-5">
                 <div className="card create-parking-card p-5">
                     <h2 className="mb-4 text-center">Upload an Image</h2>
-                    <div className="mb-3 w-50 justify-content-center mx-auto d-block">
+                    <div className="mb-3 w-40 justify-content-center mx-auto d-block">
                         <input
                             type="file"
                             className="form-control"

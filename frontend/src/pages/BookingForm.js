@@ -1,113 +1,184 @@
-import moment from 'moment';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
-import { createBooking, fetchSpaces } from '../api/api'
-import './../css/createParking.scss'
+import { createBooking } from '../api/api';
+import './../css/bookingForm.scss';
 import Layout from './Layout';
+import axios from 'axios';
 
 const BookingForm = () => {
     const { state } = useLocation();
     const user = useSelector((state) => state.user);
-    const [space, setSpace] = useState('');
+    const [slot, setSlot] = useState(null);
+    const [parkingDetails, setParkingDetails] = useState(null);
 
-    // Create a form object for storing values
     const [form, setForm] = useState({
-        vehicle_company: '',
-        vehicle_model: '',
+        vehicle_name: '',
         plate_number: '',
-        car_color: '',
-        space_id: '',
-    })
+        start_time: '',
+        paymentMethod: 'cash', // Default payment method
+    });
 
-    const [isCreated, setIsCreated] = useState(false)
-    const [error, setError] = useState()
+    const [isCreated, setIsCreated] = useState(false);
+    const [error, setError] = useState();
 
-    // Handles form values upon change
     const handleFormChange = ({ key, value }) => {
-        setForm({ ...form, [key]: value })
-    }
-
+        setForm({ ...form, [key]: value });
+    };
     const handleCreateBooking = () => {
-        setIsCreated(false)
-        setError()
-
-        const body = { ...form, user_id: user?._id }
-        createBooking({ body, handleCreateBookingSuccess, handleCreateBookingFailure })
-    }
-
-    const handleCreateBookingSuccess = (data) => {
-        setIsCreated(true)
-    }
+        setIsCreated(false);
+        setError();
+    
+        const body = {
+            ...form,
+            user_id: user?._id,
+            slotNumber: slot?.slotNumber, // Use slotNumber instead of slot_id
+            parking_id: state?.parking?._id, // Include parking_id
+            confirm_booking: "confirmed",
+        };
+    
+        createBooking({ body, handleCreateBookingSuccess, handleCreateBookingFailure });
+    };
+    const handleCreateBookingSuccess = () => {
+        setIsCreated(true);
+    };
 
     const handleCreateBookingFailure = (error) => {
-        setError(error)
-    }
+        setError(error);
+    };
 
-    const [spaces, setSpaces] = useState()
+    const fetchParkingDetails = async (parkingId) => {
+        try {
+            const response = await axios.get(`http://localhost:8000/parking/${parkingId}`);
+            setParkingDetails(response.data);
+        } catch (error) {
+            console.error("Error fetching parking details:", error);
+        }
+    };
 
     useEffect(() => {
-        // Space List API sets spaces state using setSpaces passed as callback function
-        fetchSpaces({ setSpaces })
-
-        setSpace(state?.space)
-
-        handleFormChange({ key: 'space_id', value: state?.space?._id })
-    }, [state])
-
-    console.log('space ', space);
+        if (state?.slot) {
+            setSlot(state.slot);
+            fetchParkingDetails(state.parking?._id);
+        }
+    }, [state]);
 
     return (
         <>
-        <Layout/>
-        <div className='container py-5'>
-            <div className='card create-parking-card p-5'>
-                <h3 className='mb-4'>Make booking</h3>
-                {isCreated && <div className="alert alert-success" role="alert">
-                    Booked successfully!
-                </div>}
-                {error && <div className="alert alert-danger" role="alert">
-                    {error}
-                </div>}
-                <div className="mb-3">
-                    <label htmlFor="vehicle_company" className="form-label">Vehicle company</label>
-                    <input type="text" className="form-control" id="vehicle_company" value={form?.vehicle_company} onChange={(e) => handleFormChange({ key: 'vehicle_company', value: e.target.value })} required />
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="vehicle_model" className="form-label">Vehicle model</label>
-                    <input type="text" className="form-control" id="vehicle_model" value={form?.vehicle_model} onChange={(e) => handleFormChange({ key: 'vehicle_model', value: e.target.value })} required />
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="plate_number" className="form-label">Plate number</label>
-                    <input type="text" className="form-control" id="plate_number" value={form?.plate_number} onChange={(e) => handleFormChange({ key: 'plate_number', value: e.target.value })} required />
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="car_color" className="form-label">Car color</label>
-                    <input type="text" className="form-control" id="car_color" value={form?.car_color} onChange={(e) => handleFormChange({ key: 'car_color', value: e.target.value })} required />
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="space" className="form-label">Space</label>
-                    <select className="form-select" value={form?.space_id} onChange={(e) => handleFormChange({ key: 'space_id', value: e.target.value })} disabled>
-                        <option value="">Select</option>
-                        {spaces?.map((item) => (
-                            <option value={item?._id}>{item?.name}</option>
-                        ))}
-                    </select>
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="space" className="form-label">Space details</label>
-                    <p><strong>Date: </strong>{moment.utc(space?.date).format('DD-MM-YYYY')}</p>
-                    <p><strong>Start time: </strong>{space?.slot_start_time}</p>
-                    <p><strong>End time: </strong>{space?.slot_end_time}</p>
-                    <p><strong>Price: </strong>{space?.price}</p>
-                    <p><strong>Address: </strong>{space?.parking_id?.address}</p>
-                    <p><strong>City: </strong>{space?.parking_id?.city}</p>
-                </div>
-                <button type="submit" className="btn btn-primary mt-4" onClick={handleCreateBooking}>Submit</button>
-            </div>
-        </div>
-        </>
-    )
-}
+            <Layout />
+            <div className="book-container py-5">
+                <div className="card booking-card p-5">
+                    <h3 className="mb-4 h3-Book">Slot Details</h3>
+                    {slot && parkingDetails && (
+                        <div className="slot-details">
+                            <p><strong>Slot Number:</strong> {slot?.slotNumber}</p>
+                            <p><strong>Price:</strong> ₹{slot?.price}</p>
+                            <p><strong>Availability:</strong> {slot?.isBooked ? 'Booked' : 'Available'}</p>
+                            <p><strong>Address:</strong> {parkingDetails?.address}</p>
+                            <p><strong>City:</strong> {parkingDetails?.city}</p>
+                        </div>
+                    )}
 
-export default BookingForm
+                    <h3 className="mb-4 h3-Book">Booking Form</h3>
+                    {isCreated && (
+                        <div className="alert alert-success" role="alert">
+                            Booking created successfully!
+                        </div>
+                    )}
+                    {error && (
+                        <div className="alert alert-danger" role="alert">
+                            {error}
+                        </div>
+                    )}
+
+                    <div className="mb-3">
+                        <label htmlFor="vehicle_name" className="form-book-label">Vehicle Name</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            id="vehicle_name"
+                            value={form?.vehicle_name}
+                            onChange={(e) => handleFormChange({ key: 'vehicle_name', value: e.target.value })}
+                            required
+                        />
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="plate_number" className="form-book-label">Plate Number</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            id="plate_number"
+                            value={form?.plate_number}
+                            onChange={(e) => handleFormChange({ key: 'plate_number', value: e.target.value })}
+                            required
+                        />
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="start_time" className="form-book-label">Start Time</label>
+                        <input
+                            type="time"
+                            className="form-control"
+                            id="start_time"
+                            value={form?.start_time}
+                            onChange={(e) => handleFormChange({ key: 'start_time', value: e.target.value })}
+                            required
+                        />
+                    </div>
+
+                    <div className="mb-3">
+                        <label className="form-book-label">Payment Method</label>
+                        <div className="payment-method-grid">
+                            <div className="form-check">
+                                <input
+                                    className="form-check-input"
+                                    type="radio"
+                                    name="paymentMethod"
+                                    id="cash"
+                                    value="cash"
+                                    checked={form.paymentMethod === 'cash'}
+                                    onChange={(e) => handleFormChange({ key: 'paymentMethod', value: e.target.value })}
+                                />
+                                <label className="form-check-label" htmlFor="cash">
+                                    Cash
+                                </label>
+                            </div>
+                            <div className="form-check">
+                                <input
+                                    className="form-check-input"
+                                    type="radio"
+                                    name="paymentMethod"
+                                    id="online"
+                                    value="online"
+                                    checked={form.paymentMethod === 'online'}
+                                    onChange={(e) => handleFormChange({ key: 'paymentMethod', value: e.target.value })}
+                                />
+                                <label className="form-check-label" htmlFor="online">
+                                    Online
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="d-flex justify-content-between">
+                        <button
+                            type="button"
+                            className={`btn btn-secondary half-width ${form.paymentMethod === 'online' ? 'enabled' : 'disabled'}`}
+                            disabled={form.paymentMethod !== 'online'}
+                        >
+                            Pay Now
+                        </button>
+                        <button
+                            type="submit"
+                            className="btn btn-primary half-width"
+                            onClick={handleCreateBooking}
+                        >
+                            Submit
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </>
+    );
+};
+
+export default BookingForm;
