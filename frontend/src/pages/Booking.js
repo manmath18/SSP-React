@@ -78,6 +78,9 @@ const Booking = () => {
     };
 
     useEffect(() => {
+            if (location.state?.success) {
+                setSuccessMessage(location.state.success);
+            }
         // Fetch bookings based on user type
         if (user?.type === 'owner') {
             fetchBookings({ owner_id: user?._id, setBookings });

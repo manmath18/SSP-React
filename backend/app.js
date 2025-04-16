@@ -12,6 +12,7 @@ import cors from 'cors';
 import dotenv from "dotenv";
 import reviewRouter from "./controllers/review.js";
 import path from "path";
+import paymentRouter from './controllers/payment.js';
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.get('/', async (req, res) => {
     res.json("API is running...");
 });
 
+app.use('/payment', paymentRouter);
 app.use("/user", userRouter);
 app.use("/parking", parkingRouter);
 app.use("/paymentMethod", paymentMethodRouter);

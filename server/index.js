@@ -123,58 +123,38 @@ async function create(user) {
     return { err: "something went wrong" };
   }
 }
-app.post("/initiate-payment", async (req, res) => {
-  const { client_txn_id, amount, user_id } = req.body;
-
-  if (!client_txn_id || !amount || !user_id) {
-    return res.status(400).json({ error: "Missing required fields" });
-  }
-
-  try {
-    // Generate the payment URL
-    const paymentUrl = `https://upi-frontend.vercel.app/?client_txn_id=${client_txn_id}&amount=${amount}&user_id=${user_id}`;
-    res.json({ status: true, paymentUrl });
-  } catch (error) {
-    console.error("Error generating payment URL:", error);
-    res.status(500).json({ error: "Failed to generate payment URL" });
-  }
-});
 app.post("/pay", async (req, res) => {
-  const { client_txn_id, amount, user_id } = req.body;
+  const payload = req.body.payload;
 
-  if (!client_txn_id || !amount || !user_id) {
-    return res.status(400).json({ status: false, msg: "Missing required fields" });
+  if (!payload) {
+    return res.status(400).json({ status: false, msg: "Payload is missing" });
   }
+
+  payload["key"] = process.env.merchant_key; // Ensure the merchant_key is added
+  payload["client_txn_id"] = `txn_${Date.now()}`;
+  payload["p_info"] = "UPI Payment Gateway";
+  payload["redirect_url"] = process.env.frontend_url.trim() || "http://localhost:5173/receipt";
+
+  console.log("Payload being sent to UPI Gateway:", payload);
 
   try {
-    // Generate the payment URL
-    const paymentUrl = `https://your-vercel-app.vercel.app/payment?client_txn_id=${client_txn_id}&amount=${amount}&user_id=${user_id}`;
+    const response = await axios.post("https://merchant.upigateway.com/api/create_order", payload);
 
-    res.json({ status: true, paymentUrl });
-  } catch (error) {
-    console.error("Error generating payment URL:", error);
-    res.status(500).json({ status: false, msg: "Failed to generate payment URL" });
-  }
-});
-app.post("/verify-payment", async (req, res) => {
-  const { client_txn_id } = req.body;
-
-  if (!client_txn_id) {
-    return res.status(400).json({ error: "Transaction ID is required" });
-  }
-
-  try {
-    // Simulate payment verification (replace with actual payment gateway API call)
-    const isPaymentSuccessful = true; // Replace with actual verification logic
-
-    if (isPaymentSuccessful) {
-      res.json({ status: true, message: "Payment verified successfully" });
+    if (response.data.status && response.data.payment_url) {
+      res.json({
+        status: true,
+        msg: "Order Created",
+        payment_url: response.data.payment_url,
+      });
     } else {
-      res.status(400).json({ status: false, message: "Payment verification failed" });
+      res.json({
+        status: false,
+        msg: response.data.msg || "Failed to create order.",
+      });
     }
   } catch (error) {
-    console.error("Error verifying payment:", error);
-    res.status(500).json({ error: "Failed to verify payment" });
+    console.error("Error from UPI Gateway:", error.response?.data || error.message);
+    res.status(500).json({ status: false, msg: "Failed to create order." });
   }
 });
 app.post("/payCheck", async (req, res) => {
@@ -200,9 +180,9 @@ app.post("/payCheck", async (req, res) => {
     });
 
     if (response.data.status) {
-      return res.json({ status: true, msg: "Transaction successful", user });
+      return res.json({ status: true, msg: "Transaction found", data: response.data.data, user });
     } else {
-      return res.json({ status: false, msg: "Transaction failed" });
+      return res.json({ status: false, msg: "Transaction not found" });
     }
   } catch (error) {
     console.error("Error in /payCheck:", error.message);
