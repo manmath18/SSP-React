@@ -76,13 +76,41 @@ const ImageUpload = () => {
         );
     };
 
+    const renderImages = () => {
+        if (!file || !responseData?.predicted_image_url) return null;
+
+        return (
+            <div className="mt-5 images-container">
+                <h3 className="text-center">Uploaded and Predicted Images</h3>
+                <div className="images-grid">
+                    <div className="image-wrapper">
+                        <h5 className="text-center">Uploaded Image</h5>
+                        <img
+                            src={URL.createObjectURL(file)}
+                            alt="Uploaded"
+                            className="uploaded-image"
+                        />
+                    </div>
+                    <div className="image-wrapper">
+                        <h5 className="text-center">Predicted Image</h5>
+                        <img
+                            src={`http://localhost:5000/${responseData.predicted_image_url}`}
+                            alt="Predicted"
+                            className="predicted-image"
+                        />
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
     const renderSlots = () => {
         if (!responseData || !responseData.slot_numbers || !responseData.total_slots) return null;
-    
+
         const slots = responseData.slot_numbers; // Booked and empty slots
         const totalSlots = responseData.total_slots; // Total slots detected by the model
         const slotElements = [];
-    
+
         for (let i = 1; i <= totalSlots; i++) {
             const isBooked = slots[i] === 1; // Check if the slot is booked (1 = booked, 0 = empty)
             slotElements.push(
@@ -95,7 +123,7 @@ const ImageUpload = () => {
                 </div>
             );
         }
-    
+
         return (
             <div className="mt-5 slots-container">
                 <h3 className="text-center">Slot Details</h3>
@@ -137,6 +165,7 @@ const ImageUpload = () => {
                 {responseData && (
                     <div className="results-container mt-5">
                         {renderChart()}
+                        {renderImages()}
                         {renderSlots()}
                     </div>
                 )}

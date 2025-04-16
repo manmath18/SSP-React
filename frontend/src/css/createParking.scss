@@ -1,10 +1,25 @@
-.results-container {
+.images-container {
     margin-top: 30px;
+    text-align: center;
 }
 
-.chart-container {
-    background-color: #f8f9fa;
-    padding: 20px;
+.images-grid {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.image-wrapper {
+    width: 200px;
+    text-align: center;
+}
+
+.uploaded-image,
+.predicted-image {
+    width: 100%;
+    height: auto;
+    border: 2px solid #ccc;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -49,10 +64,4 @@
 
 .slot:hover {
     transform: scale(1.1);
-}
-.create-parking-card {
-    width: 50%; /* Set the width to 70% */
-    margin: 0 auto; /* Center the card horizontally */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for better visibility */
-    border-radius: 10px; /* Optional: Add rounded corners */
 }
