@@ -132,3 +132,17 @@
     background-color: #ffc107;
     color: white;
 }
+.btn-secondary.enabled {
+    background-color: #007bff;
+    cursor: pointer;
+}
+
+.btn-secondary.enabled:hover {
+    background-color: #0056b3;
+}
+
+.btn-secondary.disabled {
+    background-color: #d3d3d3;
+    border: none;
+    cursor: not-allowed;
+}

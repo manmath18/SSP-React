@@ -1,17 +1,26 @@
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 import { deleteBooking, fetchBookings, updateBooking } from '../api/api';
 import { DeleteModal } from '../components';
 import Layout from './Layout';
 
 const Booking = () => {
     const user = useSelector((state) => state.user);
+    const location = useLocation();
     const [bookings, setBookings] = useState([]);
+    const [successMessage, setSuccessMessage] = useState(null);
 
     // Delete management states
     const [selectedBooking, setSelectedBooking] = useState();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+    useEffect(() => {
+        if (location.state?.success) {
+            setSuccessMessage(location.state.success);
+        }
+    }, [location.state]);
 
     // Used to display multiple Booking rows
     const bookingsRow = () => {
@@ -125,6 +134,11 @@ const Booking = () => {
         <>
             <Layout />
             <div className="container">
+                {successMessage && (
+                    <div className="alert alert-success mt-3" role="alert">
+                        {successMessage}
+                    </div>
+                )}
                 <h1 className="mt-5">My Bookings</h1>
 
                 <div className="row mt-2 g-5 table-responsive">

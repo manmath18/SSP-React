@@ -40,10 +40,6 @@ userRouter.post("/register", async (req, res) => {
         });
 
         const { error } = schema.validate({ name, email, password, type });
-        if (error) {
-            return res.status(400).json({ error: error.details[0].message });
-        }
-
         const userExists = await User.findOne({ email });
         if (userExists) {
             return res.status(400).json({ error: "Email already in use" });
