@@ -11,6 +11,7 @@ backend/package-lock.json
 frontend/package-lock.json
 frontend/node_modules
 backend/node_modules
+server/node_modules
 dist
 dist-ssr
 *.local
